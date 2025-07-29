@@ -38,10 +38,10 @@ blueprint:
       description: Select the bed temperature sensor entity.
       selector:
         entity:
-          filter:
-          - domain:
-            - sensor
-            integration: bambu_lab
+#          filter:
+#          - domain:
+#            - sensor
+#            integration: bambu_lab
           multiple: false
     wled_lights:
       name: WLED Light devices
