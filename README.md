@@ -1,4 +1,6 @@
 # HA-bambulab-wled
+Forked from OzDruiD, wanted to tweak a bit for personal use.
+
 Based on Dreed47 original blueprint
 OzDruiD- Updated Paul Biods with some code errors.
 
