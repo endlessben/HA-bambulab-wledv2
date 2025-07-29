@@ -40,7 +40,7 @@ blueprint:
         entity:
           filter:
           - domain:
-            - binary_sensor
+            - sensor
             integration: bambu_lab
           multiple: false
     wled_lights:
