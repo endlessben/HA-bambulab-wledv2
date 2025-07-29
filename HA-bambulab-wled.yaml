@@ -262,7 +262,7 @@ action:
         - condition: state
           entity_id: !input printer_stage
           state: finish
-        - condition: numeric_sate
+        - condition: numeric_state
           entity_id: !input bed_temperature
           below: '36'
       sequence:
