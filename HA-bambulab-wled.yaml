@@ -33,6 +33,16 @@ blueprint:
             - binary_sensor
             integration: bambu_lab
           multiple: false
+    bed_temperature:
+      name: Heatbed temperature of your Bambu Lab Printer
+      description: Select the bed temperature sensor entity.
+      selector:
+        entity:
+          filter:
+          - domain:
+            - binary_sensor
+            integration: bambu_lab
+          multiple: false
     wled_lights:
       name: WLED Light devices
       description: Select the WLED light devices you wish to control.
@@ -42,7 +52,7 @@ blueprint:
           - integration: wled
           multiple: true
 alias: Bambu Lab WLED Controller v2
-description: 'Updated in 2025 for new HA Bambu Lab Integration and increase in features'
+description: 'Forked & updated 2025-07-29 to remove flashing and other edits'
 trigger:
 - platform: state
   entity_id:
@@ -50,12 +60,17 @@ trigger:
   - !input printer_status
   - !input printer_stage
   alias: When printer stage,status or state changes
+- platform: numeric_state
+  entity_id:
+  - !input bed_temperature
+  below: '36'
+  alias: When bed temperature changes
 condition: []
 action:
 - delay:
     hours: 0
     minutes: 0
-    seconds: 5
+    seconds: 2
     milliseconds: 0
 - if:
   - condition: state
@@ -93,8 +108,8 @@ action:
       - 255
       - 255
       brightness_pct: 100
-      effect: Freqmatrix
-    alias: Turn WLED light on white with effect
+      effect: Solid
+    alias: Turn WLED light on white
     target:
       device_id: !input wled_lights
   - choose:
@@ -209,15 +224,16 @@ action:
       - service: light.turn_on
         data:
           rgb_color:
-          - 0
           - 255
+          - 160
           - 0
           brightness: 255
-          effect: Solid
+          effect: Breathe
+          speed: 30
         target:
           device_id: !input wled_lights
-        alias: Turn on Wled to green for finished status
-    alias: Do we need to set color to green?
+        alias: Turn on Wled to amber for finished status
+    alias: Do we need to set color to amber?
   - choose:
     - conditions:
       - condition: or
@@ -230,13 +246,37 @@ action:
         data:
           rgb_color:
           - 0
+          - 0
+          - 255
+          brightness: 255
+          effect: Breathe
+          speed: 30
+        target:
+          device_id: !input wled_lights
+        alias: Turn on Wled to blue with blink effect if Paused
+    alias: Do we need to set color to blue?
+  - choose:
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: finish
+        - condition: numeric_sate
+          entity_id: !input bed_temperature
+          below: '36'
+      sequence:
+      - service: light.turn_on
+        data:
+          rgb_color:
+          - 0
           - 255
           - 0
           brightness: 255
-          effect: Blink
+          effect: Solid
         target:
           device_id: !input wled_lights
-        alias: Turn on Wled to green with blink green effect if Paused
+        alias: Turn on Wled to green when print has cooled
     alias: Do we need to set color to green?
   - choose:
     - conditions:
@@ -253,10 +293,10 @@ action:
           - 0
           - 255
           brightness: 255
-          effect: Blink
+          effect: Solid
         target:
           device_id: !input wled_lights
-        alias: Turn on Wled to Blinking Blue for AutoLeveling mode
+        alias: Turn on Wled to Blue for AutoLeveling mode
     alias: Do we need to set color to blue?
   - choose:
     - conditions:
@@ -276,10 +316,10 @@ action:
           - 169
           - 0
           brightness: 255
-          effect: Blink
+          effect: Solid
         target:
           device_id: !input wled_lights
-        alias: Turn on Wled to Blinking Yellow for heating stages
+        alias: Turn on Wled to Yellow for heating stages
     alias: Do we need to set color to yellow?
   else:
     - if:
