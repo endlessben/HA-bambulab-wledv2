@@ -246,7 +246,7 @@ action:
             - 0
             bri: 255
             fx: 2
-            speed: 30
+            sx: 30
           target:
             device_id: !input wled_lights
         response_variable: return_wled
@@ -270,7 +270,7 @@ action:
             - 255
             bri: 255
             fx: 2
-            speed: 30
+            sx: 30
           target:
             device_id: !input wled_lights
         response_variable: return_wled
