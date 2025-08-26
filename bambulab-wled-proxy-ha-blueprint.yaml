@@ -1,0 +1,366 @@
+blueprint:
+  name: Bambu Lab WLED Controller
+  description: Control one or more WLED lights with Bambu 3d printer
+  domain: automation
+  input:
+    printer_status:
+      name: Print Status of your Bambu Lab printer
+      description: Select the print status entity.
+      selector:
+        entity:
+          filter:
+          - domain:
+            - sensor
+            integration: bambu_lab
+          multiple: false
+    printer_stage:
+      name: Current Stage of your Bambu Lab Printer
+      description: Select the printer current stage entity.
+      selector:
+        entity:
+          filter:
+          - domain:
+            - sensor
+            integration: bambu_lab
+          multiple: false
+    printer_state:
+      name: Printer state On/Off of your Bambu Lab Printer
+      description: Select the printer state binary sensor.
+      selector:
+        entity:
+          filter:
+          - domain:
+            - binary_sensor
+            integration: bambu_lab
+          multiple: false
+    bed_temperature:
+      name: Heatbed temperature of your Bambu Lab Printer
+      description: Select the bed temperature sensor entity.
+      selector:
+        entity:
+#          filter:
+#          - domain:
+#            - sensor
+#            integration: bambu_lab
+          multiple: false
+    wled_lights:
+      name: WLED Light devices
+      description: Select the WLED light devices you wish to control.
+      selector:
+        device:
+          filter:
+          - integration: wled
+          multiple: true
+alias: Bambu Lab WLED Controller v2
+description: 'Forked & updated 2025-07-29 to remove flashing and other edits'
+trigger:
+- platform: state
+  entity_id:
+  - !input printer_state
+  - !input printer_status
+  - !input printer_stage
+  alias: When printer stage,status or state changes
+- platform: numeric_state
+  entity_id:
+  - !input bed_temperature
+  below: '36'
+  alias: When bed temperature changes
+condition: []
+action:
+- delay:
+    hours: 0
+    minutes: 0
+    seconds: 2
+    milliseconds: 0
+- if:
+  - condition: state
+    state: 'on'
+    alias: printer state is on
+    entity_id: !input printer_state
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: !input printer_stage
+      state: scanning_bed_surface
+      alias: scanning Bed Surface
+    - condition: state
+      entity_id: !input printer_stage
+      state: cleaning_nozzle_tip
+      alias: cleaning Nozzle Tip
+    - condition: state
+      entity_id: !input printer_stage
+      state: calibrating_extrusion_flow
+      alias: calibrating Extrusion flow
+    - condition: state
+      entity_id: !input printer_stage
+      state: calibrating_extrusion
+      alias: calibrating Extrusion
+    - condition: state
+      entity_id: !input printer_status
+      state: offline
+      alias: Printer is off
+    alias: And Lidar is NOT on
+  then:
+  - service: wled_liveviewproxy.send_command
+    data:
+      command:
+        "on": true
+        col:
+        - 255
+        - 255
+        - 255
+        bri: 255
+        fx: 0
+      target:
+        device_id: !input wled_lights
+    alias: Turn WLED light on white
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: paused_filament_runout
+        - condition: state
+          entity_id: !input printer_stage
+          state: paused_front_cover_falling
+        - condition: state
+          entity_id: !input printer_stage
+          state: paused_nozzle_temperature_malfunction
+        - condition: state
+          entity_id: !input printer_stage
+          state: paused_heat_bed_temperature_malfunction
+        - condition: state
+          entity_id: !input printer_stage
+          state: paused_chamber_temperature_control_error
+        - condition: state
+          entity_id: !input printer_stage
+          state: paused_cutter_error
+        - condition: state
+          entity_id: !input printer_stage
+          state: paused_first_layer_error
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 255
+            - 0
+            - 0
+            bri: 255
+            fx: 1
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to Blinking Red for Faults above
+    alias: Do we need to set color to red?
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: idle
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 255
+            - 0
+            - 195
+            bri: 200
+            fx: 62
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to fushia with oscillate effect, for Idle Status
+    alias: Do we need to set color to white?
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: printing
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 255
+            - 255
+            - 255
+            bri: 255
+            fx: 0
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to full solid white while printing
+    alias: Do we need to set color to white?
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: filament_unloading
+        - condition: state
+          entity_id: !input printer_stage
+          state: filament_loading
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 255
+            - 255
+            - 255
+            bri: 255
+            fx: 0
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to white to check if loading/unloading is ok
+    alias: Do we need to set color to white?
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_status
+          state: finish
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 255
+            - 160
+            - 0
+            bri: 255
+            fx: 2
+            speed: 30
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to amber for finished status
+    alias: Do we need to set color to amber?
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_status
+          state: pause
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 0
+            - 0
+            - 255
+            bri: 255
+            fx: 2
+            speed: 30
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to blue with blink effect if Paused
+    alias: Do we need to set color to blue?
+  - choose:
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: finish
+        - condition: numeric_state
+          entity_id: !input bed_temperature
+          below: '36'
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 0
+            - 255
+            - 0
+            bri: 255
+            fx: 0
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to green when print has cooled
+    alias: Do we need to set color to green?
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: auto_bed_leveling
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 0
+            - 0
+            - 255
+            bri: 255
+            fx: 0
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to Blue for AutoLeveling mode
+    alias: Do we need to set color to blue?
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: !input printer_stage
+          state: heatbed_preheating
+        - condition: state
+          entity_id: !input printer_stage
+          state: heating_hotend
+      sequence:
+      - service: wled_liveviewproxy.send_command
+        data:
+          command:
+            "on": true
+            col:
+            - 255
+            - 169
+            - 0
+            bri: 255
+            fx: 0
+          target:
+            device_id: !input wled_lights
+        alias: Turn on Wled to Yellow for heating stages
+    alias: Do we need to set color to yellow?
+  else:
+    - if:
+      - condition: state
+        state: 'off'
+        alias: printer state is off for 15 sec
+        entity_id: !input printer_state
+      then:
+      - delay: "00:00:15"
+      - if:
+        - condition: state
+          state: 'off'
+          entity_id: !input printer_state
+          for:
+            hours: 0
+            minutes: 0
+            seconds: 10
+        then:
+        - service: light.turn_off
+          data: {}
+          target:
+            device_id: !input wled_lights
+          alias: Turn WLED light off if printer is detected OFF for more than 15 seconds.
+mode: single
