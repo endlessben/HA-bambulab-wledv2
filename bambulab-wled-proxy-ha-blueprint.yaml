@@ -111,8 +111,8 @@ action:
         - 255
         bri: 255
         fx: 0
-      target:
-        device_id: !input wled_lights
+    target:
+      device_id: !input wled_lights
     response_variable: return_wled
     alias: Turn WLED light on white
   - choose:
@@ -151,8 +151,8 @@ action:
             - 0
             bri: 255
             fx: 1
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to Blinking Red for Faults above
     alias: Do we need to set color to red?
@@ -174,8 +174,8 @@ action:
             - 195
             bri: 200
             fx: 62
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to fushia with oscillate effect, for Idle Status
     alias: Do we need to set color to white?
@@ -197,8 +197,8 @@ action:
             - 255
             bri: 255
             fx: 0
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to full solid white while printing
     alias: Do we need to set color to white?
@@ -223,8 +223,8 @@ action:
             - 255
             bri: 255
             fx: 0
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to white to check if loading/unloading is ok
     alias: Do we need to set color to white?
@@ -247,8 +247,8 @@ action:
             bri: 255
             fx: 2
             sx: 30
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to amber for finished status
     alias: Do we need to set color to amber?
@@ -271,8 +271,8 @@ action:
             bri: 255
             fx: 2
             sx: 30
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to blue with blink effect if Paused
     alias: Do we need to set color to blue?
@@ -297,8 +297,8 @@ action:
             - 0
             bri: 255
             fx: 0
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to green when print has cooled
     alias: Do we need to set color to green?
@@ -320,8 +320,8 @@ action:
             - 255
             bri: 255
             fx: 0
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to Blue for AutoLeveling mode
     alias: Do we need to set color to blue?
@@ -346,8 +346,8 @@ action:
             - 0
             bri: 255
             fx: 0
-          target:
-            device_id: !input wled_lights
+        target:
+          device_id: !input wled_lights
         response_variable: return_wled
         alias: Turn on Wled to Yellow for heating stages
     alias: Do we need to set color to yellow?
