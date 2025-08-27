@@ -113,7 +113,7 @@ action:
         fx: 0
       targets:
         entity_id: 
-          - !input wled_lights
+          - light.kamino_wled_strip
     response_variable: return_wled
     alias: Turn WLED light on white
   - choose:
@@ -154,7 +154,7 @@ action:
             fx: 1
           targets:
             entity_id: 
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to Blinking Red for Faults above
     alias: Do we need to set color to red?
@@ -178,7 +178,7 @@ action:
             fx: 62
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to fushia with oscillate effect, for Idle Status
     alias: Do we need to set color to white?
@@ -202,7 +202,7 @@ action:
             fx: 0
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to full solid white while printing
     alias: Do we need to set color to white?
@@ -229,7 +229,7 @@ action:
             fx: 0
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to white to check if loading/unloading is ok
     alias: Do we need to set color to white?
@@ -254,7 +254,7 @@ action:
             sx: 30
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to amber for finished status
     alias: Do we need to set color to amber?
@@ -279,7 +279,7 @@ action:
             sx: 30
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to blue with blink effect if Paused
     alias: Do we need to set color to blue?
@@ -306,7 +306,7 @@ action:
             fx: 0
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to green when print has cooled
     alias: Do we need to set color to green?
@@ -330,7 +330,7 @@ action:
             fx: 0
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to Blue for AutoLeveling mode
     alias: Do we need to set color to blue?
@@ -357,7 +357,7 @@ action:
             fx: 0
           targets:
             entity_id:
-              - !input wled_lights
+              - light.kamino_wled_strip
         response_variable: return_wled
         alias: Turn on Wled to Yellow for heating stages
     alias: Do we need to set color to yellow?
